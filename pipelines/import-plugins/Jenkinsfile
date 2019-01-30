@@ -1,0 +1,55 @@
+pipeline {
+    parameters {
+        string(defaultValue: 'master', description: 'Repository branch', name: 'BRANCH')
+    }
+
+    agent any
+
+    stages {
+        stage("Checkout code") {
+            steps {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/${BRANCH}']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CleanCheckout']],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[
+                        credentialsId: 'cxcloud-git',
+                        url: 'https://github.com/cxcloud/jenkins.git.git'
+                    ]]
+                ])
+            }
+        }
+
+        stage("Get plugins") {
+            steps {
+                withCredentials([
+                    [$class: 'UsernamePasswordMultiBinding', credentialsId:'jenkins-cli', usernameVariable: 'CLI_USER', passwordVariable: 'CLI_PASSWORD'],
+                ]) {
+                    sh '''#!/bin/bash
+                        JENKINS_PLUGINS=$(java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 \
+                            -auth $CLI_USER:$CLI_PASSWORD list-plugins | sort | egrep -o '.+ [0-9\\.-]+' | awk '{print $1":"$NF}')
+                        NEW_PLUGINS=$(diff <(echo "${JENKINS_PLUGINS}") Dockerfiles/jenkins-master/plugins.txt \
+                            | grep "^> " | cut -d ' ' -f 2)
+
+                        if [[ ! -z $NEW_PLUGINS ]]; then
+                            echo "Installing following plugins:"
+                            for PLUGIN in ${NEW_PLUGINS}; do
+                                echo "${PLUGIN}"
+                                PLUGIN_NAME=${PLUGIN%:*}
+                                PLUGIN_VER=${PLUGIN##*:}
+                                curl -s -o ${JENKINS_HOME}/plugins/${PLUGIN_NAME}.jpi \
+                                    -L http://mirrors.jenkins-ci.org/plugins/${PLUGIN_NAME}/${PLUGIN_VER}/${PLUGIN_NAME}.hpi
+                                touch ${JENKINS_HOME}/plugins/${PLUGIN_NAME}.jpi.pinned
+                            done
+                        else
+                            echo "No new plugins to install"
+                        fi
+                    '''
+                }
+            }
+        }
+
+    }
+
+}

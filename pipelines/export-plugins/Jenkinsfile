@@ -1,0 +1,92 @@
+def GIT_STATUS_MSG
+
+pipeline {
+    parameters {
+        string(defaultValue: 'master', description: 'Repository branch', name: 'BRANCH')
+    }
+
+    agent any
+
+    stages {
+        stage("Checkout code") {
+            steps {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/${BRANCH}']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CleanCheckout']],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[
+                        credentialsId: 'cxcloud-git',
+                        url: 'https://github.com/cxcloud/jenkins.git'
+                    ]]
+                ])
+            }
+        }
+
+        stage("Populate plugins file") {
+            steps {
+                withCredentials([
+                    [$class: 'UsernamePasswordMultiBinding', credentialsId:'jenkins-cli', usernameVariable: 'CLI_USER', passwordVariable: 'CLI_PASSWORD'],
+                ]) {
+                    sh '''#!/bin/bash
+                        PLUGINS_FILE="Dockerfiles/jenkins-master/plugins.txt"
+                        JENKINS_PLUGINS=$(java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 \
+                            -auth $CLI_USER:$CLI_PASSWORD list-plugins | sort | egrep -o '.+ [0-9\\.-]+' | awk '{print $1":"$NF}')
+                        NEW_PLUGINS=$(diff ${PLUGINS_FILE} <(echo "${JENKINS_PLUGINS}") \
+                            | grep "^> " | cut -d ' ' -f 2)
+
+                        if [[ ! -z $NEW_PLUGINS ]]; then
+                            echo "Adding following list of plugins to version control:"
+                            VCS_PLUGINS=$(cat ${PLUGINS_FILE})
+
+                            while read PLUGIN; do
+                                echo "${PLUGIN}"
+                                PLUGIN_WITHOUT_VERSION="${PLUGIN%:*}:"
+                                VCS_PLUGINS=$(echo "${VCS_PLUGINS}" | sed "/${PLUGIN_WITHOUT_VERSION}/d")
+                            done <<< $NEW_PLUGINS
+
+                            echo "${VCS_PLUGINS}\n${NEW_PLUGINS}" | sort > ${PLUGINS_FILE}
+                        else
+                            echo "No new plugins"
+                        fi
+                    '''
+                }
+            }
+        }
+
+        stage("Add or update plugins") {
+            steps {
+                sh 'git add Dockerfiles/jenkins-master/plugins.txt'
+                script {
+                    GIT_STATUS_MSG = sh (
+                        script: 'git status',
+                        returnStdout: true
+                    )
+                }
+                echo "${GIT_STATUS_MSG}"
+            }
+        }
+
+        stage("Push to Git") {
+            when {
+                expression {
+                    return ! GIT_STATUS_MSG.contains("nothing to commit")
+                }
+            }
+            steps {
+                withCredentials([
+                    [$class: 'UsernamePasswordMultiBinding', credentialsId:'cxcloud-git', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASSWORD'],
+                ]) {
+                    sh '''
+                        git config --global user.email "cxcloud@tieto.com"
+                        git config --global user.name "CX Cloud"
+                        git commit -m "new/updated Jenkins plugins"
+                        git push https://$GIT_USER:$GIT_PASSWORD@github.com/cxcloud/jenkins.git HEAD:${BRANCH}
+                    '''
+                }
+            }
+        }
+
+    }
+
+}
