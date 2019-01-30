@@ -15,7 +15,7 @@ pipeline {
                     submoduleCfg: [],
                     userRemoteConfigs: [[
                         credentialsId: 'cxcloud-git',
-                        url: 'https://github.com/cxcloud/jenkins.git.git'
+                        url: 'https://github.com/cxcloud/jenkins.git'
                     ]]
                 ])
             }
