@@ -29,9 +29,9 @@ pipeline {
                     [$class: 'UsernamePasswordMultiBinding', credentialsId:'jenkins-cli', usernameVariable: 'CLI_USER', passwordVariable: 'CLI_PASSWORD'],
                 ]) {
                     sh '''#!/bin/bash
-                        PLUGINS_FILE="Dockerfiles/jenkins-master/plugins.txt"
+                        PLUGINS_FILE="dockerfiles/jenkins-master/plugins.txt"
                         JENKINS_PLUGINS=$(java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 \
-                            -auth $CLI_USER:$CLI_PASSWORD list-plugins | sort | egrep -o '.+ [0-9\\.-]+' | awk '{print $1":"$NF}')
+                            -auth ${CLI_USER}:${CLI_PASSWORD} list-plugins | sort | egrep -o '.+ [0-9\\.-]+' | awk '{print $1":"$NF}')
                         NEW_PLUGINS=$(diff ${PLUGINS_FILE} <(echo "${JENKINS_PLUGINS}") \
                             | grep "^> " | cut -d ' ' -f 2)
 
@@ -56,7 +56,7 @@ pipeline {
 
         stage("Add or update plugins") {
             steps {
-                sh 'git add Dockerfiles/jenkins-master/plugins.txt'
+                sh 'git add dockerfiles/jenkins-master/plugins.txt'
                 script {
                     GIT_STATUS_MSG = sh (
                         script: 'git status',
