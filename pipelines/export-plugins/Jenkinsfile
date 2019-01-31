@@ -31,7 +31,7 @@ pipeline {
                     sh '''#!/bin/bash
                         PLUGINS_FILE="dockerfiles/jenkins-master/plugins.txt"
                         JENKINS_PLUGINS=$(java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar -s http://localhost:8080 \
-                            -auth ${CLI_USER}:${CLI_PASSWORD} list-plugins | sort | egrep -o '.+ [0-9\\.-]+' | awk '{print $1":"$NF}')
+                            -auth ${CLI_USER}:${CLI_PASSWORD} list-plugins | sort | egrep -o '.+ [a-z0-9\\.-]+' | awk '{print $1":"$NF}')
                         NEW_PLUGINS=$(diff ${PLUGINS_FILE} <(echo "${JENKINS_PLUGINS}") \
                             | grep "^> " | cut -d ' ' -f 2)
 
