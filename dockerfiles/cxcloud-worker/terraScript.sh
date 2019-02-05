@@ -16,8 +16,6 @@ modified_projects=()
 modified_files=$(git log master..HEAD --name-only --pretty=)
 
 while read -r line; do
-   # echo "line - ${line}"
-   # echo "path - $(dirname "${line}")"
     rfind index.html $(dirname "${line}")
 done <<< "$modified_files"
 
