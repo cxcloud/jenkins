@@ -55,7 +55,6 @@ RUN curl --create-dirs -fsSLo /usr/share/jenkins/slave.jar \
     && chmod 755 /usr/share/jenkins \
     && chmod 644 /usr/share/jenkins/slave.jar
 
-
 ADD jenkins-slave /usr/local/bin/jenkins-slave
 RUN chmod 755 /usr/local/bin/jenkins-slave
 
