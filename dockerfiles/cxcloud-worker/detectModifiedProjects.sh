@@ -3,8 +3,8 @@
 # global parameters
 # -----------------
 # $1 - file to search for
-# $2 - git hash fromP
-# $3 - git hash to
+# $2 - git hash from (optional)
+# $3 - git hash to (optional)
 
 # rfind() parameters
 # ------------------
