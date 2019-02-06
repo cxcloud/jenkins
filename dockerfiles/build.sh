@@ -45,7 +45,7 @@ fi
 
 # Get the image name without tag and enter the right directory
 IMAGE=${IMAGE_TAG%:*}
-cd $IMAGE
+cd $(dirname $0)/$IMAGE
 
 # Build image
 docker build --pull -t ${REGISTRY}/${IMAGE_TAG} .
