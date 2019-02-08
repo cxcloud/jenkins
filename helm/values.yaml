@@ -177,7 +177,7 @@ NetworkPolicy:
 
 ## Install Default RBAC roles and bindings
 rbac:
-  install: true
+  install: false
   serviceAccountName: default
   # Role reference
   roleRef: cluster-admin
