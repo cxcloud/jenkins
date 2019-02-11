@@ -149,7 +149,7 @@ Persistence:
   ## A manually managed Persistent Volume and Claim
   ## Requires Persistence.Enabled: true
   ## If defined, PVC must be created manually before volume will be bound
-  # ExistingClaim:
+  ExistingClaim: jenkins-storage
 
   ## jenkins data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
@@ -160,10 +160,10 @@ Persistence:
   ##
   # StorageClass: "-"
 
-  Annotations: {}
-  AccessMode: ReadWriteOnce
-  Size: 8Gi
-  volumes:
+  #Annotations: {}
+  #AccessMode: ReadWriteOnce
+  #Size: 8Gi
+  #volumes:
   #  - name: nothing
   #    emptyDir: {}
   mounts:
@@ -174,14 +174,3 @@ Persistence:
 NetworkPolicy:
   Enabled: false
   ApiVersion: networking.k8s.io/v1
-
-## Install Default RBAC roles and bindings
-rbac:
-  install: false
-  serviceAccountName: default
-  # Role reference
-  roleRef: cluster-admin
-  # Role kind (Role or ClusterRole)
-  roleKind: ClusterRole
-  # Role binding kind (RoleBinding or ClusterRoleBinding)
-  roleBindingKind: ClusterRoleBinding
