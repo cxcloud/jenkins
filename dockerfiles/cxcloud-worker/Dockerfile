@@ -47,6 +47,8 @@ RUN npm install -g cxcloud && \
     chown -R root:node /usr/local/lib/node_modules && \
     chmod -R 775 /usr/local/lib/node_modules
 
+ENV I_AM_SERVER=true
+
 # Install OpenJDK 8
 RUN apt-get -y install openjdk-8-jdk
 
