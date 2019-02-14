@@ -7,7 +7,7 @@ Master:
   ImagePullPolicy: "Always"
 # ImagePullSecret: jenkins
   Component: "jenkins-master"
-  NumExecutors: 0
+  NumExecutors: 1
   UseSecurity: true
   HostNetworking: false
   AdminUser: admin
@@ -95,7 +95,7 @@ Master:
   NodeSelector: {}
   Tolerations: {}
   PodAnnotations: {}
-
+  InstallPlugins:
   Ingress:
     ApiVersion: extensions/v1beta1
     Annotations: {}
@@ -122,11 +122,11 @@ Agent:
   Privileged: false
   resources:
     requests:
-      cpu: "200m"
-      memory: "256Mi"
+      cpu: "500m"
+      memory: "512Mi"
     limits:
-      cpu: "200m"
-      memory: "256Mi"
+      cpu: "500m"
+      memory: "512Mi"
   # You may want to change this to true while testing a new image
   AlwaysPullImage: false
   # Controls how slave pods are retained after the Jenkins build completes
@@ -161,8 +161,8 @@ Persistence:
   # StorageClass: "-"
 
   #Annotations: {}
-  #AccessMode: ReadWriteOnce
-  #Size: 8Gi
+  AccessMode: ReadWriteOnce
+  Size: 8Gi
   #volumes:
   #  - name: nothing
   #    emptyDir: {}
