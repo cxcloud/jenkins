@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.162
+FROM jenkins/jenkins:2.164
 
 USER root
 
@@ -14,6 +14,15 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
 RUN usermod -a -G docker jenkins
 
 # Pre-install plugins
-USER jenkins
 ADD plugins.txt /usr/share/jenkins/ref/plugins.txt
 RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
+
+# Pre-install jobs
+ADD jobs/ /jenkins_jobs/
+
+ADD copy-jobs.sh /usr/local/bin/
+RUN chmod 755 /usr/local/bin/copy-jobs.sh
+
+RUN sed -i -e "s|#! /bin/bash -e|#! /bin/bash -e\n/usr/local/bin/copy-jobs.sh|g" /usr/local/bin/jenkins.sh
+
+USER jenkins
