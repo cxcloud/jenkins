@@ -161,8 +161,8 @@ Persistence:
   # StorageClass: "-"
 
   #Annotations: {}
-  AccessMode: ReadWriteOnce
-  Size: 8Gi
+  #AccessMode: ReadWriteOnce
+  #Size: 8Gi
   #volumes:
   #  - name: nothing
   #    emptyDir: {}
