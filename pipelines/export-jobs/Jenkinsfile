@@ -76,7 +76,7 @@ pipeline {
             }
             steps {
                 withCredentials([
-                    [$class: 'UsernamePasswordMultiBinding', credentialsId:'tieto-bender', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASSWORD'],
+                    [$class: 'UsernamePasswordMultiBinding', credentialsId:'cxcloud-git', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASSWORD'],
                 ]) {
                     sh '''
                         git config --global user.email "cxcloud@tieto.com"
