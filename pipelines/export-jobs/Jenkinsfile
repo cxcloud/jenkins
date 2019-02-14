@@ -1,0 +1,93 @@
+def GIT_STATUS_MSG
+
+pipeline {
+    parameters {
+        string(defaultValue: 'master', description: 'Repository branch', name: 'BRANCH')
+        string(defaultValue: '', description: 'Which job to export from VCS, empty value means all', name: 'SELECTED_JOB')
+    }
+
+    agent any
+
+    stages {
+        stage("Checkout Code") {
+            steps {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/${BRANCH}']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CleanCheckout']],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[
+                        credentialsId: 'cxcloud-git',
+                        url: 'https://github.com/cxcloud/jenkins.git'
+                    ]]
+                ])
+            }
+        }
+
+        stage("Clean untracked files") {
+            steps {
+                sh 'git clean -f'
+            }
+        }
+
+        stage("Export Jobs from Jenkins") {
+            steps {
+                withCredentials([
+                    [$class: 'UsernamePasswordMultiBinding', credentialsId:'jenkins-cli', usernameVariable: 'CLI_USER', passwordVariable: 'CLI_PASSWORD'],
+                ]) {
+                    sh '''#!/bin/bash
+                        if [[ -z $SELECTED_JOB ]]; then
+                            JENKINS_JOBS=$(java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar \
+                                -s http://localhost:8080 -auth ${CLI_USER}:${CLI_PASSWORD} list-jobs)
+                        else
+                            JENKINS_JOBS=$SELECTED_JOB
+                        fi
+
+                        # Export all running jobs from Jenkins
+                        for job in ${JENKINS_JOBS}; do
+                            mkdir -p dockerfiles/jenkins-master/jobs/${job}/
+                            java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar \
+                                -s http://localhost:8080 -auth ${CLI_USER}:${CLI_PASSWORD} \
+                                get-job ${job} > dockerfiles/jenkins-master/jobs/${job}/config.xml
+                        done
+                    '''
+                }
+            }
+        }
+
+        stage("Add or update jobs") {
+            steps {
+                sh 'git add dockerfiles/jenkins-master/jobs/'
+                script {
+                    GIT_STATUS_MSG = sh (
+                        script: 'git status',
+                        returnStdout: true
+                    )
+                }
+                echo "${GIT_STATUS_MSG}"
+            }
+        }
+
+        stage("Push to Git") {
+            when {
+                expression {
+                    return ! GIT_STATUS_MSG.contains("nothing to commit")
+                }
+            }
+            steps {
+                withCredentials([
+                    [$class: 'UsernamePasswordMultiBinding', credentialsId:'tieto-bender', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASSWORD'],
+                ]) {
+                    sh '''
+                        git config --global user.email "cxcloud@tieto.com"
+                        git config --global user.name "CX Cloud"
+                        git commit -m "new/updated Jenkins jobs"
+                        git push https://$GIT_USER:$GIT_PASSWORD@github.com/cxcloud/jenkins.git HEAD:${BRANCH}
+                    '''
+                }
+            }
+        }
+
+    }
+
+}

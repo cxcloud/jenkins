@@ -1,0 +1,72 @@
+pipeline {
+    parameters {
+        string(defaultValue: 'master', description: 'Repository branch', name: 'BRANCH')
+        string(defaultValue: '', description: 'Which job to import from VCS, empty value means all', name: 'SELECTED_JOB')
+    }
+
+    agent any
+
+    stages {
+        stage("Checkout code") {
+            steps {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/${BRANCH}']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CleanCheckout']],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[
+                        credentialsId: 'cxcloud-git',
+                        url: 'https://github.com/cxcloud/metso-ci.git'
+                    ]]
+                ])
+            }
+        }
+
+        stage("Get jobs") {
+            steps {
+                withCredentials([
+                    [$class: 'UsernamePasswordMultiBinding', credentialsId:'jenkins-cli', usernameVariable: 'CLI_USER', passwordVariable: 'CLI_PASSWORD'],
+                ]) {
+                    sh '''#!/bin/bash
+                        JENKINS_JOBS=$(java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar \
+                            -s http://localhost:8080 -auth ${CLI_USER}:${CLI_PASSWORD} list-jobs)
+
+                        if [[ -z $SELECTED_JOB ]]; then
+                            VCS_JENKINS_JOBS=$(ls -1 dockerfiles/jenkins-master/jobs)
+                        else
+                            VCS_JENKINS_JOBS=$SELECTED_JOB
+                        fi
+
+                        # Export all running jobs from Jenkins
+                        for job in ${JENKINS_JOBS}; do
+                            java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar \
+                                -s http://localhost:8080 -auth ${CLI_USER}:${CLI_PASSWORD} get-job ${job} > ${job}.xml
+                        done
+
+                        for job in ${VCS_JENKINS_JOBS}; do
+                            #If exist in jenkins compare
+                            if [[ $JENKINS_JOBS = *"${job}"* ]]; then
+                                # Update
+                                UPDATE_JOB=$(diff ${job}.xml dockerfiles/jenkins-master/jobs/${job}/config.xml)
+                                if [[ ! -z $UPDATE_JOB ]]; then
+                                    echo "dockerfiles/jenkins-master/jobs/${job}/config.xml has changes, updating job"
+                                    java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar \
+                                        -s http://localhost:8080 -auth ${CLI_USER}:${CLI_PASSWORD} \
+                                        update-job ${job} < dockerfiles/jenkins-master/jobs/${job}/config.xml
+                                fi
+                            else
+                                # Insert
+                                echo "Creating job, dockerfiles/jenkins-master/jobs/${job}/config.xml"
+                                java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar \
+                                    -s http://localhost:8080 -auth ${CLI_USER}:${CLI_PASSWORD} \
+                                    create-job ${job} < dockerfiles/jenkins-master/jobs/${job}/config.xml
+                            fi
+                        done
+                    '''
+                }
+            }
+        }
+
+    }
+
+}
