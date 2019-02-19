@@ -45,7 +45,8 @@ RUN apt-get -y --no-install-recommends install \
     $(lsb_release -cs) \
     stable" && \
     apt-get update && \
-    apt-get -y --no-install-recommends install docker-ce
+    apt-get -y --no-install-recommends install docker-ce \
+    usermod -a -G docker node
 
 # install cxcloud cli
 RUN npm install -g cxcloud && \
