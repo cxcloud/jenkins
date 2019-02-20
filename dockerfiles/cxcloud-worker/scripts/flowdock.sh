@@ -71,4 +71,4 @@ read -d '' notify <<-EOF
 EOF
 
 # Notify Flowdock
-curl -i -X POST -H "Content-Type: application/json" -d "${notify}" https://api.flowdock.com/messages
+curl -s -o /dev/null -i -X POST -H "Content-Type: application/json" -d "${notify}" https://api.flowdock.com/messages
