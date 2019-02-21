@@ -10,6 +10,9 @@ All arguments are required:
     -j  Jenkins URL to build job
     -b  Git branch
     -g  Git URL
+    -n  Author name
+    -a  Author avatar
+    -x  Author message
     -s  Build status
     -c  Build Color
     -e  Environment URL to test the build
@@ -17,12 +20,15 @@ All arguments are required:
 }
 
 # Get parameters
-while getopts t:m:j:g:b:s:c:e: option; do
+while getopts t:m:j:g:n:a:x:b:s:c:e: option; do
     case "${option}" in
         t) flow_token=${OPTARG};;
         m) message=${OPTARG};;
         j) jenkins_url=${OPTARG};;
         g) git_url=${OPTARG};;
+        n) author_name=${OPTARG};;
+        a) author_avatar=${OPTARG};;
+        x) author_message=${OPTARG};;
         b) git_branch=${OPTARG};;
         s) build_status=${OPTARG};;
         c) build_color=${OPTARG};;
@@ -35,6 +41,9 @@ if [ -z "${flow_token}" ] ||
   [ -z "${message}" ] ||
   [ -z "${jenkins_url}" ] ||
   [ -z "${git_url}" ] ||
+  [ -z "${author_name}" ] ||
+  [ -z "${author_avatar}" ] ||
+  [ -z "${author_message}" ] ||
   [ -z "${git_branch}" ] ||
   [ -z "${build_status}" ] ||
   [ -z "${build_color}" ] ||
@@ -49,16 +58,16 @@ read -d '' notify <<-EOF
   "flow_token": "${flow_token}",
   "event": "activity",
   "author": {
-    "name": "Jenkins",
-    "avatar": "https://wiki.jenkins.io/download/attachments/2916393/headshot.png?version=1&modificationDate=1302753947000&api=v2"
+    "name": "${author_name}",
+    "avatar": "${author_avatar}"
   },
-  "title": "Update ${git_branch}",
+  "title": "${author_message}",
   "external_thread_id": "${git_branch}",
   "thread": {
     "title": "${git_branch}",
     "fields": [
       { "label": "Jenkins URL", "value": "<a href=${jenkins_url}>Jenkins Job</a>" },
-      { "label": "GitHub URL", "value": "<a href=${git_url}>Git ${git_branch}</a>" }
+      { "label": "GitHub URL", "value": "<a href=${git_url}>${git_branch}</a>" }
     ],
     "body": "${message}",
     "external_url": "${test_env}",
