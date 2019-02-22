@@ -44,6 +44,7 @@ git-server:1.7
 git:3.9.3
 github-api:1.95
 github-branch-source:2.4.2
+github-oauth:0.31
 github-pr-comment-build:2.0
 github:1.29.4
 handlebars:1.1.1
