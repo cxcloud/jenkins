@@ -55,6 +55,9 @@ RUN npm install -g cxcloud && \
 
 ENV I_AM_SERVER=true
 
+# install jq json library
+RUN apt-get install jq -y
+
 # Install OpenJDK 8
 RUN apt-get -y install openjdk-8-jdk
 
