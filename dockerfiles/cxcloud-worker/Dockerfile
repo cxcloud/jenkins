@@ -71,6 +71,10 @@ RUN chmod 755 /usr/local/bin/jenkins-slave
 # Create jenkins working directory
 RUN mkdir /home/jenkins && chown node:node /home/jenkins
 
+# Add Flowdock notifier
+ADD scripts/flowdock.sh /usr/local/bin/flowdock
+RUN chmod 755 /usr/local/bin/flowdock
+
 USER node
 ARG AGENT_WORKDIR=/home/jenkins/agent
 ENV AGENT_WORKDIR=${AGENT_WORKDIR}
