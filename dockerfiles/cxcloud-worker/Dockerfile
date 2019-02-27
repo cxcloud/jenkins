@@ -53,20 +53,24 @@ RUN npm install -g cxcloud && \
     chown -R root:node /usr/local/lib/node_modules && \
     chmod -R 775 /usr/local/lib/node_modules
 
+# CX Cloud CLI will bypass some checks if I_AM_SERVER=true
 ENV I_AM_SERVER=true
 
-# install jq json library
-RUN apt-get install jq -y
+# install yq yaml library
+ARG YQ_VERSION=2.2.1
+RUN curl -fsSLo /usr/local/bin/yq \ 
+    https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64 && \
+    chmod 755 /usr/local/bin/yq
 
 # Install OpenJDK 8
 RUN apt-get -y install openjdk-8-jdk
 
 # Jenkins CLI plugin
-ARG VERSION=3.28
+ARG JENKINS_CLI_VERSION=3.28
 RUN curl --create-dirs -fsSLo /usr/share/jenkins/slave.jar \
-    https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${VERSION}/remoting-${VERSION}.jar \
-    && chmod 755 /usr/share/jenkins \
-    && chmod 644 /usr/share/jenkins/slave.jar
+    https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${JENKINS_CLI_VERSION}/remoting-${JENKINS_CLI_VERSION}.jar && \
+    chmod 755 /usr/share/jenkins && \
+    chmod 644 /usr/share/jenkins/slave.jar
 
 ADD jenkins-slave /usr/local/bin/jenkins-slave
 RUN chmod 755 /usr/local/bin/jenkins-slave
