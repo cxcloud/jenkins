@@ -1,34 +1,19 @@
 #!/bin/bash
-
-# global parameters
-# -----------------
 # $1 - file to search for
-# $2 - git hash from (optional)
-# $3 - git hash to (optional)
+# $2 - from git hash
+# $3 - to git hash
 
-# rfind() parameters
-# ------------------
-# $1 - file name to find
-# $2 - start path from where to start search
+modified_projects=""
+modified_files=$(git log $2..$3 --name-only --pretty=)
+all_projects=$(find * -maxdepth 3 -name $1 -exec dirname {} \;)
 
-function rfind() {
-  current_folder="$2"
-  while [[ $current_folder != "." ]]; do
-    modified_projects+=($(find "$current_folder" -maxdepth 1 -name "$1"))
-    current_folder=$(dirname $current_folder)
-  done
-}
+while read -r file; do
+  project_modified=$(echo "${file}" | grep -o "${all_projects}")
+  if [ ! -z ${project_modified} ]; then
+    modified_projects+="${project_modified}\n"
+  elif [ "$(dirname ${file})" == "." ]; then
+    modified_projects+=".\n"
+  fi
+done <<< "$modified_files"
 
-modified_projects=()
-
-if [ -z "$2" ]; then
-  modified_files=$(git log master..HEAD --name-only --pretty=)
-else
-  modified_files=$(git log $2..$3 --name-only --pretty=)
-fi
-
-while read -r line; do
-  rfind $1 $(dirname "${line}")
-done <<<"$modified_files"
-
-echo "${modified_projects[@]}" | tr ' ' '\n' | sort -u
+printf ${modified_projects} | sort -u
