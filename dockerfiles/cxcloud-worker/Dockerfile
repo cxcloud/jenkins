@@ -56,6 +56,9 @@ RUN npm install -g cxcloud && \
 # CX Cloud CLI will bypass some checks if I_AM_SERVER=true
 ENV I_AM_SERVER=true
 
+# install jq json library
+RUN apt-get install jq -y
+
 # install yq yaml library
 ARG YQ_VERSION=2.2.1
 RUN curl -fsSLo /usr/local/bin/yq \ 
