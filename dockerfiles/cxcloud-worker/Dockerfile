@@ -68,10 +68,10 @@ RUN curl -fsSLo /usr/local/bin/yq \
 # Install OpenJDK 8
 RUN apt-get -y install openjdk-8-jdk
 
-# Jenkins CLI plugin
-ARG JENKINS_CLI_VERSION=3.28
+# Jenkins CI plugin
+ARG JENKINS_CI_VERSION=3.28
 RUN curl --create-dirs -fsSLo /usr/share/jenkins/slave.jar \
-    https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${JENKINS_CLI_VERSION}/remoting-${JENKINS_CLI_VERSION}.jar && \
+    https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${JENKINS_CI_VERSION}/remoting-${JENKINS_CI_VERSION}.jar && \
     chmod 755 /usr/share/jenkins && \
     chmod 644 /usr/share/jenkins/slave.jar
 
