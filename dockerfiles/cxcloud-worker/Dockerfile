@@ -49,7 +49,7 @@ RUN apt-get -y --no-install-recommends install \
     usermod -a -G docker node
 
 # install cxcloud cli
-RUN npm install -g cxcloud && \
+RUN npm install -g cxcloud@latest && \
     chown -R root:node /usr/local/lib/node_modules && \
     chmod -R 775 /usr/local/lib/node_modules
 
@@ -75,15 +75,8 @@ RUN curl --create-dirs -fsSLo /usr/share/jenkins/slave.jar \
     chmod 755 /usr/share/jenkins && \
     chmod 644 /usr/share/jenkins/slave.jar
 
-ADD jenkins-slave /usr/local/bin/jenkins-slave
-RUN chmod 755 /usr/local/bin/jenkins-slave
-
 # Create jenkins working directory
 RUN mkdir /home/jenkins && chown node:node /home/jenkins
-
-# Add Flowdock notifier
-ADD scripts/flowdock.sh /usr/local/bin/flowdock
-RUN chmod 755 /usr/local/bin/flowdock
 
 USER node
 ARG AGENT_WORKDIR=/home/jenkins/agent
