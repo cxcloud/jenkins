@@ -5,6 +5,7 @@ USER root
 
 # Scripts to be used in the pipeline
 COPY scripts/ /usr/local/bin
+RUN mv /usr/local/bin/flowdock.sh /usr/local/bin/flowdock
 
 # install pip and aws cli
 RUN apt-get update && apt-get install python-pip -y && \
