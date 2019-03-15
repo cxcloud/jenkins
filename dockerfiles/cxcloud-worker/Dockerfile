@@ -76,6 +76,15 @@ RUN curl --create-dirs -fsSLo /usr/share/jenkins/slave.jar \
     chmod 755 /usr/share/jenkins && \
     chmod 644 /usr/share/jenkins/slave.jar
 
+# Instal Sonar Scanner (Note that old versions might get removed)
+ARG SONAR_VERSION=3.3.0.1492
+RUN curl --insecure -o /usr/local/sonarscanner.zip \
+    -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_VERSION}-linux.zip \
+    && unzip /usr/local/sonarscanner.zip -d /usr/local/ \
+    && rm /usr/local/sonarscanner.zip
+ENV SONAR_RUNNER_HOME=/usr/local/sonar-scanner-${SONAR_VERSION}-linux
+ENV PATH=$PATH:/usr/local/sonar-scanner-${SONAR_VERSION}-linux/bin
+
 # Create jenkins working directory
 RUN mkdir /home/jenkins && chown node:node /home/jenkins
 
