@@ -5,7 +5,7 @@ Master:
   Image: jenkins/jenkins
   ImageTag: lts
   ImagePullPolicy: "Always"
-# ImagePullSecret: jenkins
+  # ImagePullSecret: jenkins
   Component: "jenkins-master"
   NumExecutors: 1
   UseSecurity: true
@@ -15,7 +15,7 @@ Master:
   resources:
     requests:
       cpu: "50m"
-      memory: "256Mi"
+      memory: "512Mi"
     limits:
       cpu: "2000m"
       memory: "2048Mi"
@@ -117,7 +117,7 @@ Agent:
   ImageTag: 3.27-1
   CustomJenkinsLabels:
     - cxcloud
-# ImagePullSecret: jenkins
+  # ImagePullSecret: jenkins
   Component: "jenkins-slave"
   Privileged: false
   resources:
@@ -126,7 +126,7 @@ Agent:
       memory: "512Mi"
     limits:
       cpu: "500m"
-      memory: "512Mi"
+      memory: "2048Mi"
   # You may want to change this to true while testing a new image
   AlwaysPullImage: false
   # Controls how slave pods are retained after the Jenkins build completes
