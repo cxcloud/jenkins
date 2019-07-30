@@ -59,11 +59,11 @@ Installing Jenkins to the Kubernetes cluster (redefine Docker image tags and oth
 
 ```sh
 helm install --name jenkins --namespace ci -f ./helm/values.yaml stable/jenkins \
-  --set Master.Image=012345678901.dkr.ecr.eu-west-1.amazonaws.com/jenkins-master \
-  --set Master.ImageTag=0.1.0-v2.180 \
-  --set Agent.Image=012345678901.dkr.ecr.eu-west-1.amazonaws.com/cxcloud-worker \
-  --set Agent.ImageTag=0.1.0 \
-  --set Master.HostName=int-jenkins.cxcloud.com
+  --set master.image=012345678901.dkr.ecr.eu-west-1.amazonaws.com/jenkins-master \
+  --set master.tag=0.1.0-v2.187 \
+  --set agent.image=012345678901.dkr.ecr.eu-west-1.amazonaws.com/cxcloud-worker \
+  --set agent.tag=0.1.0 \
+  --set ingress.hostName=int-jenkins.demo.cxcloud.com
 ```
 
 ### Jenkins credentials
@@ -93,9 +93,9 @@ The Jenkins pod can be upgraded with the following commands (redefine variables 
 
 ```sh
 helm upgrade jenkins -f ./helm/values.yaml stable/jenkins \
-  --set Master.Image=012345678901.dkr.ecr.eu-west-1.amazonaws.com/jenkins-master \
-  --set Master.ImageTag=0.2.0-v2.181 \
-  --set Agent.Image=012345678901.dkr.ecr.eu-west-1.amazonaws.com/cxcloud-worker \
-  --set Agent.ImageTag=0.2.0 \
-  --set Master.HostName=int-jenkins.cxcloud.com
+  --set master.image=012345678901.dkr.ecr.eu-west-1.amazonaws.com/jenkins-master \
+  --set master.tag=0.2.0-v2.190 \
+  --set agent.image=012345678901.dkr.ecr.eu-west-1.amazonaws.com/cxcloud-worker \
+  --set agent.tag=0.2.0 \
+  --set ingress.hostName=int-jenkins.demo.cxcloud.com
 ```
