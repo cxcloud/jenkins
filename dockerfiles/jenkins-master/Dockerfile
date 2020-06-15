@@ -1,14 +1,14 @@
-FROM jenkins/jenkins:2.191
+FROM jenkins/jenkins:2.240
 
 USER root
 
-# Install Docker
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
-    && apt update \
+# Install 
+RUN apt-get update \
     && apt install -y software-properties-common apt-transport-https \
-    && add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" \
-    && apt update \
-    && apt install -y docker-ce
+    && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
+    && add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" \
+    && apt-get update \
+    && apt-get -y install docker-ce docker-ce-cli containerd.io
 
 # Add group docker to user jenkins
 RUN usermod -a -G docker jenkins

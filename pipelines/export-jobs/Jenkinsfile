@@ -27,6 +27,7 @@ pipeline {
         stage("Clean untracked files") {
             steps {
                 sh 'git clean -f'
+                sh 'curl -fsSLo jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar'
             }
         }
 
@@ -37,7 +38,7 @@ pipeline {
                 ]) {
                     sh '''#!/bin/bash
                         if [[ -z $SELECTED_JOB ]]; then
-                            JENKINS_JOBS=$(java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar \
+                            JENKINS_JOBS=$(java -jar jenkins-cli.jar \
                                 -s http://localhost:8080 -auth ${CLI_USER}:${CLI_PASSWORD} list-jobs)
                         else
                             JENKINS_JOBS=$SELECTED_JOB
@@ -46,7 +47,7 @@ pipeline {
                         # Export all running jobs from Jenkins
                         for job in ${JENKINS_JOBS}; do
                             mkdir -p dockerfiles/jenkins-master/jobs/${job}/
-                            java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar \
+                            java -jar jenkins-cli.jar \
                                 -s http://localhost:8080 -auth ${CLI_USER}:${CLI_PASSWORD} \
                                 get-job ${job} > dockerfiles/jenkins-master/jobs/${job}/config.xml
                         done
