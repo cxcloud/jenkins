@@ -27,7 +27,6 @@ pipeline {
         stage("Clean untracked files") {
             steps {
                 sh 'git clean -f'
-                sh 'curl -fsSLo jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar'
             }
         }
 
@@ -36,6 +35,7 @@ pipeline {
                 withCredentials([
                     [$class: 'UsernamePasswordMultiBinding', credentialsId:'jenkins-cli', usernameVariable: 'CLI_USER', passwordVariable: 'CLI_PASSWORD'],
                 ]) {
+                    sh 'curl -fsSLo jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar'
                     sh '''#!/bin/bash
                         if [[ -z $SELECTED_JOB ]]; then
                             JENKINS_JOBS=$(java -jar jenkins-cli.jar \

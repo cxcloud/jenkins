@@ -27,8 +27,9 @@ pipeline {
                 withCredentials([
                     [$class: 'UsernamePasswordMultiBinding', credentialsId:'jenkins-cli', usernameVariable: 'CLI_USER', passwordVariable: 'CLI_PASSWORD'],
                 ]) {
+                    sh 'curl -fsSLo jenkins-cli.jar http://localhost:8080/jnlpJars/jenkins-cli.jar'
                     sh '''#!/bin/bash
-                        JENKINS_JOBS=$(java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar \
+                        JENKINS_JOBS=$(java -jar jenkins-cli.jar \
                             -s http://localhost:8080 -auth ${CLI_USER}:${CLI_PASSWORD} list-jobs)
 
                         if [[ -z $SELECTED_JOB ]]; then
@@ -39,7 +40,7 @@ pipeline {
 
                         # Export all running jobs from Jenkins
                         for job in ${JENKINS_JOBS}; do
-                            java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar \
+                            java -jar jenkins-cli.jar \
                                 -s http://localhost:8080 -auth ${CLI_USER}:${CLI_PASSWORD} get-job ${job} > ${job}.xml
                         done
 
@@ -50,14 +51,14 @@ pipeline {
                                 UPDATE_JOB=$(diff ${job}.xml dockerfiles/jenkins-master/jobs/${job}/config.xml)
                                 if [[ ! -z $UPDATE_JOB ]]; then
                                     echo "dockerfiles/jenkins-master/jobs/${job}/config.xml has changes, updating job"
-                                    java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar \
+                                    java -jar jenkins-cli.jar \
                                         -s http://localhost:8080 -auth ${CLI_USER}:${CLI_PASSWORD} \
                                         update-job ${job} < dockerfiles/jenkins-master/jobs/${job}/config.xml
                                 fi
                             else
                                 # Insert
                                 echo "Creating job, dockerfiles/jenkins-master/jobs/${job}/config.xml"
-                                java -jar ${JENKINS_HOME}/war/WEB-INF/jenkins-cli.jar \
+                                java -jar jenkins-cli.jar \
                                     -s http://localhost:8080 -auth ${CLI_USER}:${CLI_PASSWORD} \
                                     create-job ${job} < dockerfiles/jenkins-master/jobs/${job}/config.xml
                             fi
