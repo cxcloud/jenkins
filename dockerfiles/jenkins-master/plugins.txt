@@ -3,8 +3,7 @@ amazon-ecr:1.6
 ant:1.11
 antisamy-markup-formatter:2.0
 apache-httpcomponents-client-4-api:4.5.10-2.0
-authentication-tokens:1.3
-aws-credentials:1.28
+authentication-tokens:1.4
 aws-java-sdk:1.11.799
 blueocean-autofavorite:1.2.4
 blueocean-bitbucket-pipeline:1.23.2
@@ -18,6 +17,7 @@ blueocean-executor-info:1.23.2
 blueocean-git-pipeline:1.23.2
 blueocean-github-pipeline:1.23.2
 blueocean-i18n:1.23.2
+blueocean-jira:1.23.2
 blueocean-jwt:1.23.2
 blueocean-personalization:1.23.2
 blueocean-pipeline-api-impl:1.23.2
@@ -34,7 +34,7 @@ cloudbees-folder:6.14
 command-launcher:1.4
 conditional-buildstep:1.3.6
 credentials-binding:1.23
-credentials:2.3.9
+credentials:2.3.10
 cvs:2.16
 display-url-api:2.3.2
 docker-build-publish:1.3.2
@@ -64,8 +64,7 @@ jquery-detached:1.2.1
 jsch:0.1.55.2
 junit:1.29
 kubernetes-client-api:4.9.2-2
-kubernetes-credentials:0.7.0
-kubernetes:1.26.1
+kubernetes:1.26.2
 ldap:1.24
 lockable-resources:2.8
 mailer:1.32
@@ -75,9 +74,10 @@ matrix-project:1.16
 maven-plugin:3.6
 mercurial:2.10
 momentjs:1.1.1
+oauth-credentials:0.4
 okhttp-api:3.14.9
 pam-auth:1.6
-parameterized-trigger:2.36
+parameterized-trigger:2.37
 pipeline-build-step:2.12
 pipeline-github-lib:1.0
 pipeline-github:2.5
@@ -89,9 +89,10 @@ pipeline-model-declarative-agent:1.1.1
 pipeline-model-definition:1.7.0
 pipeline-model-extensions:1.7.0
 pipeline-rest-api:2.13
-pipeline-stage-step:2.3
+pipeline-stage-step:2.4
 pipeline-stage-tags-metadata:1.7.0
 pipeline-stage-view:2.13
+plain-credentials:1.7
 pubsub-light:1.13
 run-condition:1.3
 scm-api:2.6.3
@@ -100,6 +101,7 @@ snakeyaml-api:1.26.4
 sonar-quality-gates:1.3.1
 sonar:2.11
 sse-gateway:1.23
+ssh-credentials:1.18.1
 structs:1.20
 subversion:2.13.1
 token-macro:2.12
