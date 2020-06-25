@@ -58,9 +58,9 @@ kubectl apply -f helm/rbac.yaml
 Installing Jenkins to the Kubernetes cluster (redefine Docker image tags and other variables)
 
 ```sh
-helm install --name jenkins --namespace ci -f ./helm/values.yaml stable/jenkins \
+helm install jenkins stable/jenkins --namespace ci -f ./helm/values.yaml \
   --set master.image=012345678901.dkr.ecr.eu-west-1.amazonaws.com/jenkins-master \
-  --set master.tag=0.1.0-v2.187 \
+  --set master.tag=0.1.0-v2.235.1-lts \
   --set agent.image=012345678901.dkr.ecr.eu-west-1.amazonaws.com/cxcloud-worker \
   --set agent.tag=0.1.0 \
   --set ingress.hostName=int-jenkins.demo.cxcloud.com
@@ -92,9 +92,9 @@ Jenkins and the worker should also regularly be upgraded with the building jenki
 The Jenkins pod can be upgraded with the following commands (redefine variables and image tag):
 
 ```sh
-helm upgrade jenkins -f ./helm/values.yaml stable/jenkins \
+helm upgrade jenkins stable/jenkins --namespace ci -f ./helm/values.yaml \
   --set master.image=012345678901.dkr.ecr.eu-west-1.amazonaws.com/jenkins-master \
-  --set master.tag=0.2.0-v2.190 \
+  --set master.tag=0.2.0-v2.235.2-lts \
   --set agent.image=012345678901.dkr.ecr.eu-west-1.amazonaws.com/cxcloud-worker \
   --set agent.tag=0.2.0 \
   --set ingress.hostName=int-jenkins.demo.cxcloud.com
